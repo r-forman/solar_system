@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <utility> // for std:pair
 
 /****  New Workflow ****
 cd build
@@ -11,15 +12,34 @@ make
 
 */
 
+// Planet class
+// attributes:
+//      orbit equation
+//      t0
+//      polar coordinates @ t0
+
+std::pair<float, float> calculate_position(){
+    float current_x = 0.0, current_y = 0.0;
+    return {current_x, current_y};
+}
+
 
 int main()
 {
 
     std::cout << "Solar System Simulation\n";
 
-    float radius;
-    scanf("%f",&radius);
-    printf("The solar system had a radius of %.1f AU.\n", radius);
+    /*
+    double radius;
+    std::cout   << "Enter solar system radius [AU]: ";
+    std::cin    >> radius;
+    std::cout   << "The solar system had a radius of "
+                << radius
+                << std::endl;
+    */
 
+    auto [x, y] = calculate_position();
+
+    std::cout   << "Planet position: " << x << ", " << y << std::endl;
     return 0;
 }
