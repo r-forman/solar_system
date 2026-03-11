@@ -1,16 +1,14 @@
-
 #include <iostream>
 #include <vector>
 #include <cmath>
 #include <matplot/matplot.h>
-#include <utility> // for std:pair
+#include <utility> // for std::pair
 
 /*      New Workflow
 cd build
 cmake ..    <- only needed if CMakeLists changes
 make
 ./solar
-
 */
 
 // Planet class
@@ -24,12 +22,9 @@ std::pair<float, float> calculate_position(){
     return {current_x, current_y};
 }
 
-// void plot_planets()
-
 struct orbital_pos {
     double x, y;
 };
-
 
 class Planet {
 public:
@@ -50,6 +45,7 @@ public:
             radius * std::sin(theta)
         };
     }
+
 private:
     double radius;
     double omega;
@@ -59,73 +55,44 @@ private:
 
 int main()
 {
+    using namespace matplot;
 
-    std::cout << "Solar System Simulation\n";
+    auto f = figure(true);
+    hold(on);
 
-    /*
-    double date;
-    std::cout   << "Enter the date desired: ";
-    std::cin    >> date;
-    */
+    std::vector<std::pair<std::string, Planet>> planets = {
+        {"Mercury", Planet(0.39, 2*M_PI/88.0, 0, 0)},
+        {"Venus",   Planet(0.72, 2*M_PI/225.0, 0, 0)},
+        {"Earth",   Planet(1.00,  2*M_PI/365.25, 0, 0)},
+        {"Mars",    Planet(1.52, 2*M_PI/687.0, 0, 0)},
+        {"Jupiter", Planet(5.203, 2*M_PI/4332.59, 0, 0)},
+        {"Saturn",  Planet(9.537, 2*M_PI/10759, 0, 0)},
+        {"Uranus",  Planet(19.191,2*M_PI/30687, 0, 0)},
+        {"Neptune", Planet(30.068,2*M_PI/60190, 0, 0)}
+    };
 
-    auto [x, y] = calculate_position();
+    for (auto& [name, planet] : planets)
+    {
+        std::vector<double> xs;
+        std::vector<double> ys;
 
-    std::cout   << "Planet position: " << x << ", " << y << std::endl;
+        for (double t = 0; t <= 700; t += 0.5)
+        {
+            orbital_pos pos = planet.position(t);
+            xs.push_back(pos.x);
+            ys.push_back(pos.y);
+        }
 
-    std::cout << "                            *" << std::endl;
-    std::cout << "                            *" << std::endl;
+        plot(xs, ys)->display_name(name);
+    }
 
-    // Earth example (approx)
-    double radius = 1.0;                 // AU
-    double period = 365.25;              // days
-    double omega = 2 * M_PI / period;    // rad/day
+    axis(equal);
+    legend();
+    title("Inner Solar System Orbits");
+    xlabel("X (AU)");
+    ylabel("Y (AU)");
 
-    Planet earth(radius, omega, 0.0, 0.0);
-
-
-
-    double t = 100.0; // days
-
-    orbital_pos pos = earth.position(t);
-
-    /*
-
-    Celestial
-    Body        | Symbol
-    ---------   | ------
-    Sun	        | ☉
-    Mercury     | ☿
-    Venus       | ♀
-    Earth       | ⊕ or ♁
-    Moon        | ☾ or ☽
-    Mars        | ♂
-    Jupiter     | ♃
-    Saturn      | ♄
-    Uranus      | ♅ or ⛢|
-    Neptune     | ♆
-    Pluto       | ♇
-    */
-
-    std::cout << "x = " << pos.x << ", y = " << pos.y << "\n"
-              << "   -      -        ---            ---        -     \n"
-              << "  -     -      --                      --      -   \n"
-              << "-     --     -        ------------        -     -- \n"
-              << "     -     -      --                --      -     -\n"
-              << "    -     -                            -     -     \n"
-              << "   -     -               _ _ _ _ _                 \n"
-              << "  -     -           - ‾‾           ‾‾ -            \n"
-              << "  -    -         -                       -         \n"
-              << " -    -        -       .-- ‾‾‾‾‾ --.       -       \n"
-              << " -    -       -      /   .- ‾‾‾ -.   \\      -     \n"
-              << "-    -        -     |   |    ☉    |   |     -      \n"
-              << " -    -       -      \\   -. ___ .-   /      -     \n"
-              << " -    -        -      ` -- _____ -- '      -       \n"
-              << "  -     -    -    -                     -          \n"
-              << "   -    --    --    ‾  - - - - - - -  ‾            \n"
-              << "    -     -     -                                  \n"
-              << "     -     -      --                    --         \n"
-              << "-     --     -        ----------------             \n"
-              << "  -     -      --                                  \n";
+    show();
 
     return 0;
 }
