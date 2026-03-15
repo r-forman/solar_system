@@ -18,7 +18,7 @@ struct orbital_pos {
 std::pair<int, std::string> assign_planet_parameters(const std::string& name){
         int marker_size;
         std::string color;
-        std::cout << name << std::endl;
+        std::cout << name << ": calculating trajectory" << std::endl;
 
         if (name == "Mercury"){
             marker_size = 4;
@@ -99,6 +99,8 @@ private:
 int main() {
     using namespace matplot;
 
+    std::cout << "Solar System Simulation\n";
+
     auto f = figure(true);
     hold(on);
 
@@ -115,7 +117,8 @@ int main() {
         {"Mars",    Planet(1.524, 0.093, 2*M_PI/687.0, 6.0, 0.0)}
     };
 
-    double t_now = 9569.0; // days since t0, Mar 14th 2026 (Pi Day!)
+    // double t_now = 9569.0; // days since t0, Mar 14th 2026 (Pi Day!)
+    double t_now = 0.0;
 
     for (size_t i = 0; i < planets.size(); ++i) {
         auto& [name, planet] = planets[i];
@@ -128,8 +131,13 @@ int main() {
             xs.push_back(pos.x);
             ys.push_back(pos.y);
         }
+
+        // Determine the proper size and color of the planet
+        auto [mark_size, planet_color] = assign_planet_parameters(name);
         auto orbit_line = plot(xs, ys);
-        orbit_line->color(orbit_colors[i % orbit_colors.size()]);
+        orbit_line->color(planet_color);
+        std::string orbital_legend_name = name + "'s Orbit";
+        orbit_line->display_name(orbital_legend_name);           // show in legend
 
         // Draw current planet position as a circle using scatter
         orbital_pos cur = planet.position(t_now);
@@ -138,13 +146,9 @@ int main() {
         auto marker = scatter(px, py);
 
         marker->marker_face(true);
-        std::cout << name << std::endl;
-
-        auto [mark_size, planet_color] = assign_planet_parameters(name);
-
         marker->marker_size(mark_size);
         marker->color(planet_color);
-        marker->display_name(name);              // only planet in legend
+        marker->display_name(name);
     }
 
     // Draw the Sun at the center using scatter
@@ -157,10 +161,11 @@ int main() {
     sun_marker->color("yellow");
     sun_marker->display_name("Sun");           // show in legend
 
+    // Complete plot attributes
     axis(equal);
     xlabel("X (AU)");
     ylabel("Y (AU)");
-    title("Inner Solar System Orbits with Ellipticity");
+    title("Inner Solar System Orbits");
     legend();
     show();
 
